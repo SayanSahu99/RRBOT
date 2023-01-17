@@ -29,7 +29,7 @@ class makeReservationDialog extends ComponentDialog {
         this.addDialog(new TextPrompt(TEXT_PROMPT));
         this.addDialog(new ChoicePrompt(CHOICE_PROMPT));
         this.addDialog(new ConfirmPrompt(CONFIRM_PROMPT));
-        this.addDialog(new NumberPrompt(NUMBER_PROMPT), this.noOfParticipantsValidator);
+        this.addDialog(new NumberPrompt(NUMBER_PROMPT, this.noOfParticipantsValidator));
         this.addDialog(new DateTimePrompt(DATETIME_PROMPT));
 
         this.addDialog(new WaterfallDialog(WATERFALL_DIALOG, [
@@ -76,6 +76,12 @@ class makeReservationDialog extends ComponentDialog {
 
         if (step.result === true) {
             return await step.prompt(TEXT_PROMPT, 'In what name reservation is to be made');
+        }
+
+        if(step.result === false){
+            await step.context.sendActivity("Ok, no problem. You can make reservation later.");
+            endDialog = true;
+            return await step.endDialog();
         }
     }
 

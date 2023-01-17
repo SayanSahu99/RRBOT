@@ -4,6 +4,7 @@
 const { ActivityHandler, MessageFactory } = require('botbuilder');
 
 const { makeReservationDialog } = require('../rrbot/componentDialogs/makeReservationDialog');
+const { cancelReservationDialog } = require('../rrbot/componentDialogs/cancelReservationDialog');
 
 class RRBot extends ActivityHandler {
     constructor(conversationState, userState) {
@@ -13,6 +14,7 @@ class RRBot extends ActivityHandler {
         this.userState = userState;
         this.dialogState = conversationState.createProperty("dialogState");
         this.makeReservationDialog = new makeReservationDialog(this.conversationState, this.userState);
+        this.cancelReservationDialog = new cancelReservationDialog(this.conversationState, this.userState);
 
         this.previousIntent = this.conversationState.createProperty("previousIntent");
         this.conversationData = this.conversationState.createProperty('conservationData');
@@ -87,11 +89,25 @@ class RRBot extends ActivityHandler {
                 await this.makeReservationDialog.run(context, this.dialogState);
                 conversationData.endDialog = await this.makeReservationDialog.isDialogComplete();
                 if (conversationData.endDialog) {
+                    await this.previousIntent.set(context, { intentName: null});
                     await this.sendSuggestedActions(context);
 
                 }
 
                 break;
+
+                case 'Cancel Reservation':
+                    console.log("Inside Cancel Reservation Case");
+                    await this.conversationData.set(context, { endDialog: false });
+                    await this.cancelReservationDialog.run(context, this.dialogState);
+                    conversationData.endDialog = await this.cancelReservationDialog.isDialogComplete();
+                    if (conversationData.endDialog) {
+                        await this.previousIntent.set(context, { intentName: null});
+                        await this.sendSuggestedActions(context);
+    
+                    }
+    
+                    break;
 
             default:
                 console.log("Did not match Make Reservation case");
