@@ -105,7 +105,9 @@ class makeReservationDialog extends ComponentDialog {
         }
     }
 
-    async noOfParticipantsValidator
+    async noOfParticipantsValidator(promptContext) {
+        return promptContext.recognized.succeeded && promptContext.recognized.value > 1 && promptContext.recognized.value < 150;
+    }
 }
 
 module.exports = makeReservationDialog;
